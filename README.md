@@ -5,8 +5,9 @@
 <h1 align="center">PureMac</h1>
 
 <p align="center">
-  <b>Free, open-source macOS cleaner.</b> The CleanMyMac alternative that respects your privacy.<br>
-  No subscriptions. No telemetry. No data collection. Just a clean Mac.
+  <b>Free, open-source macOS app manager and system cleaner.</b><br>
+  Uninstall apps completely. Find orphaned files. Clean system junk.<br>
+  No subscriptions. No telemetry. No data collection.
 </p>
 
 <p align="center">
@@ -23,21 +24,10 @@
   <a href="#install">Install</a> -
   <a href="#features">Features</a> -
   <a href="#screenshots">Screenshots</a> -
-  <a href="#comparison">Comparison</a> -
   <a href="#contributing">Contributing</a>
 </p>
 
 ---
-
-## Why PureMac?
-
-Most Mac cleaning apps cost $30-50/year, collect usage data, and show upsell popups. PureMac does the same job for free, runs entirely offline, and the source code is right here for you to audit.
-
-- **100% free** - no trial, no premium tier, no subscriptions
-- **100% private** - no analytics, no telemetry, no network calls
-- **100% native** - built with SwiftUI, no Electron, no web views
-- **100% open source** - MIT licensed, audit the code yourself
-- **Signed & notarized** - Apple Developer ID, no Gatekeeper warnings
 
 ## Install
 
@@ -50,11 +40,9 @@ brew install --cask puremac
 
 ### Direct Download
 
-Download the latest `.app` from [Releases](https://github.com/momenbasel/PureMac/releases/latest), unzip, and drag to `/Applications`.
+Download the latest `.dmg` from [Releases](https://github.com/momenbasel/PureMac/releases/latest), open it, and drag PureMac to `/Applications`.
 
-> Signed and notarized with Apple Developer ID - installs without security warnings.
-
-
+> Signed and notarized with Apple Developer ID - installs without Gatekeeper warnings.
 
 ### Build from source
 
@@ -69,85 +57,105 @@ open build/Build/Products/Release/PureMac.app
 
 ## Features
 
-- **Smart Scan** - One-click scan across all categories
-- **System Junk** - System caches, logs, and temporary files
-- **User Cache** - Application caches and browser data
-- **AI Apps** - Ollama and LM Studio logs, caches, and temporary app data
-- **Mail Attachments** - Downloaded mail attachments
-- **Trash Bins** - Empty all Trash bins
-- **Large & Old Files** - Files over 100 MB or older than 1 year
-- **Purgeable Space** - APFS purgeable disk space (Time Machine snapshots)
-- **Xcode Junk** - Derived data, archives, and simulator caches
-- **Homebrew Cache** - Homebrew download cache
-- **Scheduled Cleaning** - Automatic scans on configurable intervals
-- **Auto-Purge** - Automatically purge purgeable files on schedule
-- **Click-to-inspect** - See exactly what will be removed before cleaning
+### App Uninstaller
+- Discovers all installed apps from `/Applications` and `~/Applications`
+- Heuristic file discovery engine with **10-level matching** (bundle ID, company name, entitlements, team identifier, Spotlight metadata, container discovery)
+- **3 sensitivity levels**: Strict (safe), Enhanced (balanced), Deep (thorough)
+- Shows all related files: caches, preferences, containers, logs, support files, launch agents
+- System app protection - 27 Apple apps are excluded from the uninstall list
+- Master-detail view: app table on left, discovered files on right
+
+### Orphaned File Finder
+- Detects leftover files in `~/Library` from apps that have been uninstalled
+- Compares Library contents against all installed app identifiers
+- One-click cleanup of orphaned files
+
+### System Cleaner
+- **Smart Scan** - one-click scan across all categories
+- **System Junk** - system caches, logs, and temporary files
+- **User Cache** - dynamically discovers all app caches (no hardcoded app list)
+- **Mail Attachments** - downloaded mail attachments
+- **Trash Bins** - empty all Trash
+- **Large & Old Files** - files over 100 MB or older than 1 year
+- **Purgeable Space** - APFS purgeable disk space detection
+- **Xcode Junk** - DerivedData, Archives, simulator caches
+- **Brew Cache** - Homebrew download cache (detects custom HOMEBREW_CACHE)
+- **Scheduled Cleaning** - automatic scans on configurable intervals
+
+### Native macOS Experience
+- Built with SwiftUI using native macOS components
+- `NavigationSplitView`, `Toggle`, `ProgressView`, `Form`, `GroupBox`, `Table`
+- Respects system light/dark mode automatically
+- No custom gradients, glows, or web-app styling
+- First-launch onboarding with Full Disk Access setup
+
+### Safety
+- Confirmation dialogs before all destructive operations
+- Symlink attack prevention - resolves and validates paths before deletion
+- System app protection - Apple apps cannot be uninstalled
+- Large & Old Files are never auto-selected
+- Structured logging via `os.log` (visible in Console.app)
 
 ## Screenshots
 
-| Smart Scan | Category Detail | File Inspector |
-|---|---|---|
-| ![Smart Scan](screenshots/smart-scan.png) | ![System Junk](screenshots/system-junk-detail.png) | ![Category View](screenshots/category-view.png) |
-
-## Comparison
-
-How does PureMac stack up against other Mac cleaning tools?
-
-| Feature | PureMac | CleanMyMac X | OnyX | AppCleaner |
-|---|---|---|---|---|
-| Price | **Free** | $39.95/yr | Free | Free |
-| Open source | **Yes** | No | No | No |
-| Privacy (no telemetry) | **Yes** | No | Yes | Yes |
-| System cache cleaning | **Yes** | Yes | Yes | No |
-| Xcode junk cleaning | **Yes** | Yes | No | No |
-| Scheduled auto-cleaning | **Yes** | Yes | No | No |
-| Purgeable space purging | **Yes** | No | No | No |
-| App uninstaller | No | Yes | No | Yes |
-| Malware scanner | No | Yes | No | No |
-| Native SwiftUI | **Yes** | No (AppKit) | No (AppKit) | No (AppKit) |
-| macOS Ventura+ | **Yes** | Yes | Yes | Yes |
-
-## Scheduling
-
-1. Open **Settings** (gear icon or Cmd+,)
-2. Go to the **Schedule** tab
-3. Enable **Automatic Cleaning**
-4. Choose your interval: hourly / 3h / 6h / 12h / daily / weekly / biweekly / monthly
-5. Optionally enable **Auto-clean after scan** and **Auto-purge purgeable space**
-
-## What Gets Cleaned
-
-| Category | Paths |
+| Onboarding | App Uninstaller |
 |---|---|
-| System Junk | `/Library/Caches`, `/Library/Logs`, `/tmp`, `~/Library/Logs` |
-| User Cache | `~/Library/Caches`, npm/pip/yarn/pnpm caches |
-| AI Apps | `~/.ollama/logs`, Ollama caches/WebKit/saved state, `~/.lmstudio/server-logs` |
-| Mail Attachments | `~/Library/Mail Downloads` |
-| Trash | `~/.Trash` |
-| Large Files | `~/Downloads`, `~/Documents`, `~/Desktop` (>100MB or >1yr old) |
-| Purgeable | Time Machine local snapshots via `tmutil` |
-| Xcode | `DerivedData`, `Archives`, `CoreSimulator/Caches` |
-| Homebrew | `~/Library/Caches/Homebrew` |
+| ![Onboarding](screenshots/onboarding.png) | ![App Uninstaller](screenshots/app-uninstaller.png) |
 
-## Safety
+| System Junk | Xcode Junk |
+|---|---|
+| ![System Junk](screenshots/system-junk.png) | ![Xcode Junk](screenshots/xcode-junk.png) |
 
-- Never deletes system-critical files
-- Only removes caches, logs, temporary files, and user-selected items
-- AI Apps excludes Ollama models, LM Studio models, and LM Studio conversations
-- Large & Old Files are **not auto-selected** - you choose what to remove
-- All operations are non-destructive to the operating system
-- Purgeable space uses only Time Machine snapshots, not actual free space
+| User Cache |
+|---|
+| ![User Cache](screenshots/user-cache.png) |
+
+## Architecture
+
+```
+PureMac/
+  Logic/Scanning/     - Heuristic scan engine, locations database, conditions
+  Logic/Utilities/    - Structured logging
+  Models/             - Data models, typed errors
+  Services/           - Scan engine, cleaning engine, scheduler
+  ViewModels/         - Centralized app state
+  Views/              - Native SwiftUI views
+    Apps/             - App uninstaller views
+    Cleaning/         - Smart scan and category views
+    Orphans/          - Orphan finder
+    Settings/         - Native Form-based settings
+    Components/       - Shared components
+```
+
+Key components:
+- **AppPathFinder** - 10-level heuristic matching engine for discovering app-related files
+- **Locations** - 120+ macOS filesystem search paths
+- **Conditions** - 25 per-app matching rules for edge cases (Xcode, Chrome, VS Code, etc.)
+- **AppInfoFetcher** - Spotlight metadata + Info.plist fallback for app discovery
+- **Logger** - Apple `os.log` unified logging
 
 ## Contributing
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+Areas where help is especially welcome:
+- Size/date filter presets in category views
+- XCTest coverage for AppState and scan engine
+- Localization (zh-Hans, zh-Hant, and other languages)
+- App icon design
+
+## Acknowledgments
+
+v2.0 was shaped by community feedback and contributions:
+
+- **[@nguyenhuy158](https://github.com/nguyenhuy158)** - Search and filter feature request ([#18](https://github.com/momenbasel/PureMac/issues/18)) and implementation ([#29](https://github.com/momenbasel/PureMac/pull/29))
+- **[@edufalcao](https://github.com/edufalcao)** - Cleaning safety guards and confirmation dialogs ([#30](https://github.com/momenbasel/PureMac/pull/30))
+- **[@zeck00](https://github.com/zeck00)** - UI overhaul ([#31](https://github.com/momenbasel/PureMac/pull/31)), app uninstaller with system app protection ([#32](https://github.com/momenbasel/PureMac/pull/32)), and onboarding experience ([#33](https://github.com/momenbasel/PureMac/pull/33))
+- **[@0x-man](https://github.com/0x-man)** - Symlink security vulnerability report ([#25](https://github.com/momenbasel/PureMac/issues/25))
+- **[@ansidev](https://github.com/ansidev)** - Checkbox interaction bug report ([#34](https://github.com/momenbasel/PureMac/issues/34))
+- **[@fengcheng01](https://github.com/fengcheng01)** - App uninstaller feature request ([#28](https://github.com/momenbasel/PureMac/issues/28))
+- **[@scholzfuni](https://github.com/scholzfuni)** - Modularization proposal ([#23](https://github.com/momenbasel/PureMac/issues/23))
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
----
-
-<p align="center">
-  If PureMac saved you time or money, consider giving it a star on GitHub.
-</p>
