@@ -34,7 +34,7 @@
 ### Homebrew (recommended)
 
 ```bash
-brew tap momenbasel/tap
+brew update
 brew install --cask puremac
 ```
 
