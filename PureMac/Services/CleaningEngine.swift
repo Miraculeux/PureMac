@@ -39,7 +39,8 @@ actor CleaningEngine {
                     continue
                 }
 
-                try fileManager.removeItem(atPath: item.path)
+                // Delete the resolved path to prevent TOCTOU symlink-swap attacks
+                try fileManager.removeItem(atPath: resolved)
                 result.freedSpace += item.size
                 result.itemsCleaned += 1
             } catch {

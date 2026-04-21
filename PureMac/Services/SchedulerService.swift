@@ -95,27 +95,20 @@ class SchedulerService: ObservableObject {
         guard let appPath = Bundle.main.executablePath else { return }
 
         let intervalSeconds = Int(config.interval.seconds)
-        let plistContent = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>Label</key>
-            <string>\(plistName)</string>
-            <key>ProgramArguments</key>
-            <array>
-                <string>\(appPath)</string>
-                <string>--scheduled-clean</string>
-            </array>
-            <key>StartInterval</key>
-            <integer>\(intervalSeconds)</integer>
-            <key>RunAtLoad</key>
-            <false/>
-        </dict>
-        </plist>
-        """
+        let plistDict: [String: Any] = [
+            "Label": plistName,
+            "ProgramArguments": [appPath, "--scheduled-clean"],
+            "StartInterval": intervalSeconds,
+            "RunAtLoad": false
+        ]
 
-        try? plistContent.write(to: plistPath, atomically: true, encoding: .utf8)
+        guard let plistData = try? PropertyListSerialization.data(
+            fromPropertyList: plistDict,
+            format: .xml,
+            options: 0
+        ) else { return }
+
+        try? plistData.write(to: plistPath, options: .atomic)
 
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/launchctl")

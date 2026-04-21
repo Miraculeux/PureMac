@@ -42,7 +42,7 @@ final class Logger: ObservableObject {
     }
 
     nonisolated func log(_ message: String, level: LogLevel = .info, source: String = #function) {
-        osLogger.log(level: level.osLogType, "\(message, privacy: .public)")
+        osLogger.log(level: level.osLogType, "\(message, privacy: .private)")
 
         let entry = LogEntry(message: message, level: level, source: source)
         Task { @MainActor [weak self] in

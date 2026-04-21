@@ -124,11 +124,13 @@ struct CLI {
     }
 
     private static func printJSON(_ results: [(String, Int, Int64)]) {
-        var entries: [String] = []
-        for (name, count, size) in results {
-            entries.append("    {\"category\": \"\(name)\", \"items\": \(count), \"bytes\": \(size)}")
+        let array = results.map { (name, count, size) -> [String: Any] in
+            ["category": name, "items": count, "bytes": size]
         }
-        print("[\n\(entries.joined(separator: ",\n"))\n]")
+        if let data = try? JSONSerialization.data(withJSONObject: array, options: .prettyPrinted),
+           let json = String(data: data, encoding: .utf8) {
+            print(json)
+        }
     }
 
     private static func printUsage() {

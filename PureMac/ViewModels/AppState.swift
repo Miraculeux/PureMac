@@ -139,7 +139,12 @@ final class AppState: ObservableObject {
     /// Uses Finder via AppleScript to move files to Trash.
     /// This triggers the standard macOS authorization prompt for protected files.
     private func trashViaFinder(urls: [URL], completion: @escaping (Bool) -> Void) {
-        let posixPaths = urls.map { "\"\($0.path)\"" }.joined(separator: ", ")
+        let posixPaths = urls.map {
+            let escaped = $0.path
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+            return "\"\(escaped)\""
+        }.joined(separator: ", ")
         let script = """
         tell application "Finder"
             set theFiles to {}
